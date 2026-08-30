@@ -1,6 +1,6 @@
 export class QuantumCircuitRenderer {
     private canvas: HTMLCanvasElement;
-    private ctx: CanvasRenderingContext2d;
+    private ctx: CanvasRenderingContext2D;
 
     constructor(canvasId: string) {
         this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
