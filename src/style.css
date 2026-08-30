@@ -1,0 +1,65 @@
+/* Q-Code IDE - Enterprise UX Style Architecture Sheet */
+:root {
+  --bg-darkest: #06070a;
+  --bg-darker: #0c0d12;
+  --bg-dark: #12141c;
+  --bg-light: #1a1d29;
+  --accent-cyan: #00f3ff;
+  --text-main: #e2e8f0;
+  --border-color: #23283b;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Fira Code', monospace; background-color: var(--bg-darkest); color: var(--text-main); overflow: hidden; width: 100vw; height: 100vh; }
+
+#app { display: flex; width: 100vw; height: calc(100vh - 25px); background-color: var(--bg-darker); }
+
+/* Left Activity Sidebar */
+.sidebar { width: 55px; height: 100%; background-color: var(--bg-darkest); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; }
+.activity-bar .icon { width: 100%; height: 55px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; transition: all 0.2s; opacity: 0.5; }
+.activity-bar .icon:hover, .activity-bar .icon.active { opacity: 1; background-color: var(--bg-dark); }
+.activity-bar .icon.active { border-left: 3px solid var(--accent-cyan); }
+
+/* Workspace Folder Explorer Tree */
+.workspace-panel { width: 240px; height: 100%; background-color: var(--bg-darker); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding-top: 10px; }
+.panel-section-title { font-size: 11px; font-weight: 800; color: #718096; padding: 5px 15px; letter-spacing: 1px; }
+.folder-tree { padding: 10px 15px; font-size: 13px; line-height: 24px; color: #a0aec0; }
+.tree-item { cursor: pointer; padding-left: 5px; border-radius: 3px; }
+.tree-item:hover { background-color: var(--bg-light); color: var(--text-main); }
+.tree-item.active { background-color: #1e2538; color: var(--accent-cyan); font-weight: bold; }
+.compiler-status-box { margin: 10px 15px; padding: 12px; background: var(--bg-darkest); border: 1px solid var(--border-color); border-radius: 4px; font-size: 12px; }
+.status-row { display: flex; justify-content: space-between; margin-bottom: 6px; color: #a0aec0; }
+
+/* Mid Central Matrix (Split View Editor + Terminal) */
+.main-work-matrix { flex: 1; height: 100%; display: flex; flex-direction: column; background: var(--bg-dark); }
+.editor-container { flex: 6; width: 100%; display: flex; flex-direction: column; position: relative; border-bottom: 1px solid var(--border-color); }
+.tab-bar { height: 35px; width: 100%; background: var(--bg-darkest); display: flex; border-bottom: 1px solid var(--border-color); }
+.tab { padding: 0 15px; height: 100%; display: flex; align-items: center; font-size: 12px; color: #718096; border-right: 1px solid var(--border-color); cursor: pointer; background: #090a0f; }
+.tab.active { background: var(--bg-dark); color: var(--text-main); border-top: 2px solid var(--accent-cyan); }
+.close-tab { margin-left: 8px; font-size: 14px; opacity: 0.5; }
+.close-tab:hover { opacity: 1; color: #f56565; }
+#monaco-root { width: 100%; flex: 1; }
+
+/* Integrated Output Terminal */
+.terminal-panel { flex: 3; width: 100%; background: var(--bg-darkest); display: flex; flex-direction: column; }
+.terminal-tabs { height: 30px; display: flex; border-bottom: 1px solid var(--border-color); background: #08090d; }
+.term-tab { padding: 0 15px; font-size: 11px; font-weight: bold; color: #4a5568; display: flex; align-items: center; cursor: pointer; }
+.term-tab.active { color: var(--accent-cyan); border-bottom: 2px solid var(--accent-cyan); }
+.terminal-body { flex: 1; padding: 12px; overflow-y: auto; font-family: 'Consolas', monospace; font-size: 12px; line-height: 18px; }
+.log-line.info { color: #a0aec0; }
+.log-line.success { color: #48bb78; }
+.log-line.warning { color: #ecc94b; }
+.log-line.cmd { color: var(--accent-cyan); font-weight: bold; }
+
+/* Right Telemetry Sidebar Panel */
+.visualization-panel { width: 400px; height: 100%; background-color: var(--bg-darker); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; }
+.panel-header { padding: 14px 15px; background-color: var(--bg-darkest); font-size: 11px; font-weight: 800; letter-spacing: 2px; color: var(--accent-cyan); border-bottom: 1px solid var(--border-color); }
+.panel-section { flex: 1; padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
+.panel-section h3 { margin-bottom: 10px; font-size: 12px; color: #718096; letter-spacing: 1px; }
+#circuit-output canvas { width: 100%; height: 110px; background: var(--bg-darkest); border: 1px solid var(--border-color); border-radius: 4px; }
+#bloch-output canvas { width: 100% !important; height: 100% !important; max-height: 240px; }
+
+/* System Status Bar Component */
+.status-bar-wrapper { height: 25px; width: 100vw; background: var(--bg-darkest); border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; font-size: 11px; color: #a0aec0; }
+.status-left, .status-right { display: flex; gap: 15px; }
+.status-item.green { color: #48bb78; font-weight: bold; }

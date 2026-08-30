@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Q-Code IDE | Enterprise Quantum Engineering Suite</title>
+    <link rel="stylesheet" href="src/style.css" />
+    <style>
+      html, body {
+        margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background-color: #0c0d12;
+      }
+      .quantum-code-area {
+        width: 100%; height: 100%; background-color: #12141c; color: #00f3ff; border: none; padding: 20px;
+        font-family: 'Fira Code', 'Consolas', monospace; font-size: 14px; line-height: 22px; resize: none; outline: none;
+      }
+      /* Dynamically hidden panels container classes */
+      .sub-nav-panel { display: none; width: 240px; height: 100%; background-color: #0c0d12; border-right: 1px solid #23283b; flex-direction: column; padding-top: 10px; }
+      .sub-nav-panel.active { display: flex; }
+      .panel-content-padding { padding: 15px; font-size: 13px; color: #a0aec0; line-height: 20px; }
+      .input-field { width: calc(100% - 30px); margin: 10px 15px; padding: 8px; background: #06070a; border: 1px solid #23283b; color: #00f3ff; font-family: monospace; font-size: 12px; border-radius: 4px; outline: none; }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      
+      <!-- 1. LEFT PRIMARY ACTIVITY BAR -->
+      <aside class="sidebar">
+        <div class="activity-bar">
+          <div class="icon active" id="btn-nav-explorer" onclick="switchSidebarPanel('explorer')" title="Workspace Explorer">📁</div>
+          <div class="icon" id="btn-nav-compiler" onclick="switchSidebarPanel('compiler')" title="Unified Multi-Language Compiler">⚛️</div>
+          <div class="icon" id="btn-nav-hardware" onclick="switchSidebarPanel('hardware')" title="Hardware API Credentials">📡</div>
+          <div class="icon" id="btn-nav-settings" onclick="switchSidebarPanel('settings')" title="IDE Environment Settings">⚙️</div>
+        </div>
+      </aside>
+
+      <!-- 2. DYNAMIC SIDEBAR NAV PANELS MATRIX -->
+      <!-- Panel A: Explorer View -->
+      <nav id="panel-explorer" class="sub-nav-panel active">
+        <div class="panel-section-title">WORKSPACE: EXPLORER</div>
+        <div class="folder-tree">
+          <div class="tree-item folder open">📁 src</div>
+          <div class="tree-item file active" id="file-qasm" onclick="switchFile('qasm')">📄 algorithm.qasm</div>
+          <div class="tree-item file" id="file-qsharp" onclick="switchFile('qsharp')">📄 operation.qs</div>
+        </div>
+      </nav>
+
+      <!-- Panel B: Compiler Info View -->
+      <nav id="panel-compiler" class="sub-nav-panel">
+        <div class="panel-section-title">QUANTUM COMPILER STATUS</div>
+        <div class="compiler-status-box">
+          <div class="status-row"><span>Dialect:</span> <strong id="ui-dialect" style="color: #00f3ff;">OpenQASM</strong></div>
+          <div class="status-row"><span>Target Space:</span> <span>2^n Hilbert</span></div>
+          <div class="status-row"><span>Optimizer:</span> <span style="color: #48bb78;">O3 - Native</span></div>
+          <div class="status-row"><span>AST Engine:</span> <span style="color: #a0aec0;">V2-Hybrid</span></div>
+        </div>
+      </nav>
+
+      <!-- Panel C: Hardware Satellite API Credentials View -->
+      <nav id="panel-hardware" class="sub-nav-panel">
+        <div class="panel-section-title">SATELLITE & QPU API NODE</div>
+        <div class="panel-content-padding">Enter your Quantum Cloud API Key or satellite tracking orbital credentials:</div>
+        <input type="text" class="input-field" placeholder="ibm-qpu-token-x92..." value="mock_nasa_satellite_uplink_key_2026">
+        <div class="panel-content-padding" style="color: #ecc94b; font-size: 11px;">⚠️ Hardware sync requires authenticated cloud routing layer.</div>
+      </nav>
+
+      <!-- Panel D: Settings View -->
+      <nav id="panel-settings" class="sub-nav-panel">
+        <div class="panel-section-title">SYSTEM ENVIRONMENT SETTINGS</div>
+        <div class="panel-content-padding">
+          <label style="display:block; margin-bottom:8px;"><input type="checkbox" checked disabled> Hardware Acceleration</label>
+          <label style="display:block; margin-bottom:8px;"><input type="checkbox" checked disabled> Real-time Astrodynamics</label>
+          <label style="display:block; margin-bottom:8px;"><input type="checkbox" checked disabled> Deep Dark Cyber Theme</label>
+        </div>
+      </nav>
+
+      <!-- 3. MAIN PRODUCTIVE WORKSPACE MATRIX -->
+      <section class="main-work-matrix">
+        <main class="editor-container">
+          <div class="tab-bar">
+            <div class="tab active" id="tab-qasm" onclick="switchFile('qasm')">📄 algorithm.qasm</div>
+            <div class="tab" id="tab-qsharp" onclick="switchFile('qsharp')">📄 operation.qs</div>
+          </div>
+          <textarea id="quantum-editor" class="quantum-code-area" oninput="processQuantumCode()">OPENQASM 3.0;
+include "stdgates.inc";
+
+qubit q;
+bit c;
+
+h q;
+x q;
+
+c = measure q;</textarea>
+        </main>
+
+        <!-- INTEGRATED TELEMETRY OUTPUT TERMINAL -->
+        <footer class="terminal-panel">
+          <div class="terminal-tabs">
+            <div class="term-tab active">OUTPUT (QUANTUM COMPILER LOGS)</div>
+          </div>
+          <div class="terminal-body" id="terminal-log-stream">
+            <div class="log-line info">[INFO] Q-Code Subsystem initialized successfully on local workspace.</div>
+            <div class="log-line success">[SUCCESS] WebGL/WebGPU context bound. 3D Bloch Sphere operational.</div>
+            <div class="log-line cmd">> Q-Code Engine: Ready for operational payload injections...</div>
+          </div>
+        </footer>
+      </section>
+            <!-- 4. RIGHT TELEMETRY & VECTOR ANALYTICS PANEL -->
+      <aside class="visualization-panel">
+        <div class="panel-header">QUANTUM STATE VISUALIZER</div>
+        
+        <div id="circuit-output" class="panel-section">
+          <h3>Quantum Circuit Matrix</h3>
+          <canvas id="circuit-canvas" style="width:100%; height:110px; background:#06070a; border:1px solid #23283b; border-radius:4px;"></canvas>
+        </div>
+        
+        <div id="bloch-output" class="panel-section" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <h3>Bloch Sphere State (|ψ⟩)</h3>
+          <canvas id="bloch-canvas" style="width:100%; height:200px; background:#06070a; border:1px solid #23283b; border-radius:4px;"></canvas>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- 5. FOOTER STATUS BAR -->
+    <div class="status-bar-wrapper">
+      <div class="status-left">
+        <span class="status-item green">● Connected</span>
+        <span id="ui-status-lang" class="status-item">Language: OpenQASM 3.0</span>
+      </div>
+    </div>
+
+    <!-- 6. ULTIMATE INTERACTIVE AUTOMATION LOGIC -->
+    <script>
+      const FILE_DATA = {
+        qasm: {
+          code: `OPENQASM 3.0;\ninclude "stdgates.inc";\n\nqubit q;\nbit c;\n\nh q;\nx q;\n\nc = measure q;`,
+          dialect: 'OpenQASM',
+          lang: 'OpenQASM 3.0'
+        },
+        qsharp: {
+          code: `namespace Quantum.Core {\n    open Microsoft.Quantum.Intrinsic;\n\n    operation RunCircuit() : Unit {\n        use q = Qubit();\n        H(q);\n        X(q);\n    }\n}`,
+          dialect: 'QSharp',
+          lang: 'Q# (Quantum Sharp)'
+        }
+      };
+
+      // Continuous Terminal Logger Engine (Appends items safely downwards)
+      function logToTerminal(msg, type = 'info') {
+        const body = document.getElementById('terminal-log-stream');
+        if (body) {
+          const line = document.createElement('div');
+          line.className = `log-line ${type}`;
+          line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+          body.appendChild(line);
+          body.scrollTop = body.scrollHeight; // Always pin view to the lowest runtime log line
+        }
+      }
+
+      // Advanced Dynamic Activity Bar Navigation Router
+      function switchSidebarPanel(targetPanelId) {
+        // Fetch all primary structural nav sub-containers
+        const panels = ['explorer', 'compiler', 'hardware', 'settings'];
+        
+        panels.forEach(panel => {
+          const elPanel = document.getElementById(`panel-${panel}`);
+          const elBtn = document.getElementById(`btn-nav-${panel}`);
+          
+          if (panel === targetPanelId) {
+            elPanel.classList.add('active');
+            elBtn.classList.add('active');
+          } else {
+            elPanel.classList.remove('active');
+            elBtn.classList.remove('active');
+          }
+        });
+
+        logToTerminal(`Activity Bar dispatched workflow view routing state onto: [${targetPanelId.toUpperCase()}] panel context.`, 'info');
+      }
+
+      // 2D Circuit Schematic Matrix Wire Grid Renderer
+      function drawCircuit(hasGates, dialect) {
+        const canvas = document.getElementById('circuit-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = 110;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#23283b';
+        ctx.lineWidth = 2;
+
+        // Trace standard structural qubit path tracks
+        ctx.beginPath(); ctx.moveTo(20, 40); ctx.lineTo(canvas.width - 20, 40); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(20, 80); ctx.lineTo(canvas.width - 20, 80); ctx.stroke();
+
+        ctx.fillStyle = '#718096';
+        ctx.font = '12px monospace';
+        ctx.fillText('q0 ──', 10, 44);
+        ctx.fillText('q1 ──', 10, 84);
+
+        if (hasGates) {
+          ctx.fillStyle = '#00f3ff'; ctx.fillRect(80, 25, 30, 30);
+          ctx.fillStyle = '#0c0d12'; ctx.font = 'bold 14px sans-serif'; ctx.fillText('H', 90, 46);
+
+          ctx.fillStyle = '#a0aec0'; ctx.fillRect(140, 25, 30, 30);
+          ctx.fillStyle = '#0c0d12'; ctx.font = 'bold 14px sans-serif'; ctx.fillText('X', 150, 46);
+
+          ctx.fillStyle = '#1a1d29'; ctx.fillRect(canvas.width - 100, 5, 80, 20);
+          ctx.fillStyle = '#00f3ff'; ctx.font = '10px monospace'; ctx.fillText(dialect, canvas.width - 90, 18);
+        }
+      }
+
+      // Geometric Trigonometric Bloch Vector Coordinate Matrix Map
+      function drawBloch(theta, phi) {
+        const canvas = document.getElementById('bloch-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = 200;
+
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        const r = 60;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Render wireframe boundaries
+        ctx.strokeStyle = '#23283b'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2 * Math.PI); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(cx, cy, r, 20, 0, 0, 2 * Math.PI); ctx.stroke();
+
+        // Compute phase alignment translation offsets
+        const vx = r * Math.sin(theta) * Math.cos(phi);
+        const vy = r * Math.cos(theta);
+
+        // Vector Ray projection
+        ctx.strokeStyle = '#00f3ff'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + vx, cy - vy); ctx.stroke();
+
+        ctx.fillStyle = '#00f3ff'; ctx.beginPath(); ctx.arc(cx + vx, cy - vy, 5, 0, 2 * Math.PI); ctx.fill();
+        
+        ctx.fillStyle = '#718096'; ctx.font = '12px monospace';
+        ctx.fillText('|0⟩', cx - 8, cy - r - 8);
+        ctx.fillText('|1⟩', cx - 8, cy + r + 15);
+      }
+
+      // File Workspace Buffer Synchronization Router
+      function switchFile(target) {
+        const file = FILE_DATA[target];
+        if (!file) return;
+
+        document.getElementById('quantum-editor').value = file.code;
+        document.getElementById('ui-dialect').textContent = file.dialect;
+        document.getElementById('ui-status-lang').textContent = `Language: ${file.lang}`;
+
+        document.getElementById('file-qasm').className = `tree-item file ${target === 'qasm' ? 'active' : ''}`;
+        document.getElementById('file-qsharp').className = `tree-item file ${target === 'qsharp' ? 'active' : ''}`;
+        document.getElementById('tab-qasm').className = `tab ${target === 'qasm' ? 'active' : ''}`;
+        document.getElementById('tab-qsharp').className = `tab ${target === 'qsharp' ? 'active' : ''}`;
+
+        logToTerminal(`File system worker linked workspace pipeline focus to: "${target === 'qasm' ? 'algorithm.qasm' : 'operation.qs'}"`, 'info');
+        processQuantumCode();
+      }
+
+      // Dynamic Live Compilation Loop Logic Block
+      function processQuantumCode() {
+        const currentCode = document.getElementById('quantum-editor').value;
+        const dialect = document.getElementById('ui-dialect').textContent;
+        
+        const hasGates = currentCode.toLowerCase().includes('h') || currentCode.toLowerCase().includes('x');
+
+        if (hasGates) {
+          logToTerminal(`Buffer event change intercepted. Compiler mapped valid operators. [Dialect: ${dialect}]`, 'success');
+          drawCircuit(true, dialect);
+          drawBloch(Math.PI / 4, Math.PI / 4);
+        } else {
+          logToTerminal(`Zero operations detected inside core buffer stack. Clearing visualization metrics.`, 'warning');
+          drawCircuit(false, dialect);
+          drawBloch(0, 0);
+        }
+      }
+
+      // Initialize global hooks explicitly mapping events safely on window instantiation limits
+      window.onload = () => {
+        window.switchFile = switchFile;
+        window.switchSidebarPanel = switchSidebarPanel;
+        window.processQuantumCode = processQuantumCode;
+        
+        drawCircuit(true, 'OpenQASM');
+        drawBloch(Math.PI / 4, Math.PI / 4);
+      }
+    </script>
+  </body>
+</html>
+

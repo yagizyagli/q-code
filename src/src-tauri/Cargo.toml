@@ -1,0 +1,14 @@
+[package]
+name = "q-code-core"
+version = "1.0.0"
+edition = "2021"
+authors = ["Yağız Yağlı"]
+description = "High-performance Multi-Language Quantum IDE Core Engine"
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-shell = { version = "2" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+ndarray = "0.15" 
+lazy_static = "1.4" 
