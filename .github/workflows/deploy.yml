@@ -1,0 +1,46 @@
+name: Deploy Q-Code IDE to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # Triggers compilation every time you push to the main branch
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository Source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Project Dependencies
+        run: npm ci
+
+      - name: Execute Enterprise Web Build Pipeline
+        run: npm run build
+
+      - name: Upload Static Web Production Assets
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist' # Deploys the high-performance compiled dist folder
+
+      - name: Deploy Live Framework to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
