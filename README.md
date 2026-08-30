@@ -99,6 +99,9 @@ npm run tauri dev
 Developed with passion by **Yağız Yağlı**. 
 Focusing on the alignment of cutting-edge software paradigms with deep physical hardware systems execution mechanics.
 
+Yağız Yağlı: [@yagizyagli](https://github.com/yagizyagli)
+Live Demo: [q-code](https://yagizyagli.github.io/q-code/)
+
 ---
 
 ## ⭐ Support & Contribute
